@@ -7,21 +7,19 @@ const isLoading = ref(false);
 const genres = ref([]);
 const tvShows = ref([]);
 
-// Carregar lista de gêneros quando o componente for montado
 onMounted(async () => {
   const response = await api.get("genre/tv/list?language=pt-BR");
   genres.value = response.data.genres;
 });
 
-// Função para listar programas de TV relacionados ao Batman
 const listTvShows = async (genreId) => {
   isLoading.value = true;
   try {
     const response = await api.get('search/tv', {
       params: {
-        query: 'Batman',  // Busca por programas relacionados ao Batman
+        query: 'Batman',
         language: 'pt-BR',
-        with_genres: genreId  // Filtro por gênero (opcional)
+        with_genres: genreId
       }
     });
     tvShows.value = response.data.results;
@@ -31,7 +29,6 @@ const listTvShows = async (genreId) => {
   isLoading.value = false;
 };
 
-// Função para pegar o nome do gênero com base no ID
 const getGenreName = (id) => {
   const genre = genres.value.find((genre) => genre.id === id);
   return genre ? genre.name : 'Desconhecido';
@@ -39,6 +36,14 @@ const getGenreName = (id) => {
 </script>
 
 <template>
+  <header>
+
+<nav>
+  <router-link to="/">Home</router-link>
+  <router-link to="/filmes">Filmes</router-link>
+  <router-link to="/tv">Programas de TV</router-link>
+</nav>
+</header>
   <div class="main-container">
     <h1 class="page-title">Programas de TV relacionados ao Batman</h1>
     <ul class="genre-list">
@@ -52,10 +57,8 @@ const getGenreName = (id) => {
       </li>
     </ul>
     
-    <!-- Carregamento -->
     <loading v-model:active="isLoading" is-full-page />
 
-    <!-- Lista de programas de TV -->
     <div class="tv-show-list">
       <div v-for="show in tvShows" :key="show.id" class="tv-show-card">
         <img
@@ -73,15 +76,14 @@ const getGenreName = (id) => {
 </template>
 
 <style scoped>
-/* Background */
 .main-container {
   background-color: #141414;
   padding: 20px;
   color: white;
   font-family: 'Arial', sans-serif;
+  
 }
 
-/* Title */
 .page-title {
   font-size: 2.5rem;
   font-weight: bold;
@@ -90,28 +92,39 @@ const getGenreName = (id) => {
   letter-spacing: -1px;
 }
 
-/* Genres */
 .genre-list {
   display: flex;
+  flex-wrap: wrap;
   justify-content: center;
   gap: 1rem;
   margin-bottom: 2rem;
+  list-style: none;
+  padding: 0;
 }
 
 .genre-item {
   background-color: rgba(255, 255, 255, 0.3);
-  padding: 10px 20px;
-  border-radius: 20px;
+  padding: 10px 25px;
+  border-radius: 25px;
   cursor: pointer;
-  transition: background-color 0.3s ease;
+  transition: background-color 0.3s ease, transform 0.3s ease;
   font-weight: bold;
+  text-transform: uppercase;
+  font-size: 1rem;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  text-align:  center;
+  width: 10rem;
+}
+
+.genre-item:hover {
+  background-color: rgba(255, 255, 255, 0.6);
+  transform: translateY(-5px);
 }
 
 .genre-item:hover {
   background-color: rgba(255, 255, 255, 0.6);
 }
 
-/* TV show list */
 .tv-show-list {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
@@ -132,7 +145,6 @@ const getGenreName = (id) => {
   transform: scale(1.05);
 }
 
-/* Image */
 .tv-show-image {
   width: 100%;
   height: 100%;
@@ -140,7 +152,6 @@ const getGenreName = (id) => {
   border-radius: 10px;
 }
 
-/* TV show info */
 .tv-show-info {
   position: absolute;
   bottom: 10px;
@@ -166,9 +177,36 @@ const getGenreName = (id) => {
   margin-top: 5px;
 }
 
-/* Loading overlay */
 .loading-overlay {
   z-index: 9999;
   background-color: rgba(0, 0, 0, 0.8);
+}
+header {
+  height: 3rem;
+  display: flex;
+  background-color: #333;
+  color: #ffffff;
+  font-size: 1.2rem;
+  padding-left: 2rem;
+  align-items: center;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+ 
+}
+
+nav {
+  column-gap: 2rem;
+  margin-bottom: 0;
+  display: flex;
+  align-items: center;
+}
+
+nav a {
+  text-decoration: none;
+  color: #ffffff;
+  transition: color 0.3s ease;
+}
+
+nav a:hover {
+  color: #ff6347;
 }
 </style>
