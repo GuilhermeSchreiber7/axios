@@ -2,6 +2,7 @@
 import { ref, onMounted } from "vue";
 import api from "@/plugins/axios";
 import Loading from "vue-loading-overlay";
+import NavBar from "@/components/NavBar.vue";
 
 const isLoading = ref(false);
 const genres = ref([]);
@@ -36,14 +37,7 @@ const getGenreName = (id) => {
 </script>
 
 <template>
-  <header>
-
-<nav>
-  <router-link to="/">Home</router-link>
-  <router-link to="/filmes">Filmes</router-link>
-  <router-link to="/tv">Programas de TV</router-link>
-</nav>
-</header>
+  <nav-bar />
   <div class="main-container">
     <h1 class="page-title">Programas de TV relacionados ao Batman</h1>
     <ul class="genre-list">
@@ -56,7 +50,6 @@ const getGenreName = (id) => {
         {{ genre.name }}
       </li>
     </ul>
-    
     <loading v-model:active="isLoading" is-full-page />
 
     <div class="tv-show-list">
@@ -75,15 +68,13 @@ const getGenreName = (id) => {
   </div>
 </template>
 
-<style scoped>
+<style scoped lang="scss">
 .main-container {
   background-color: #141414;
   padding: 20px;
   color: white;
   font-family: 'Arial', sans-serif;
-  
 }
-
 .page-title {
   font-size: 2.5rem;
   font-weight: bold;
@@ -91,7 +82,6 @@ const getGenreName = (id) => {
   text-align: center;
   letter-spacing: -1px;
 }
-
 .genre-list {
   display: flex;
   flex-wrap: wrap;
@@ -101,7 +91,6 @@ const getGenreName = (id) => {
   list-style: none;
   padding: 0;
 }
-
 .genre-item {
   background-color: rgba(255, 255, 255, 0.3);
   padding: 10px 25px;
@@ -115,23 +104,19 @@ const getGenreName = (id) => {
   text-align:  center;
   width: 10rem;
 }
-
 .genre-item:hover {
   background-color: rgba(255, 255, 255, 0.6);
   transform: translateY(-5px);
 }
-
 .genre-item:hover {
   background-color: rgba(255, 255, 255, 0.6);
 }
-
 .tv-show-list {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
   gap: 20px;
   margin-top: 2rem;
 }
-
 .tv-show-card {
   position: relative;
   overflow: hidden;
@@ -140,18 +125,15 @@ const getGenreName = (id) => {
   transition: transform 0.3s ease-in-out;
   cursor: pointer;
 }
-
 .tv-show-card:hover {
   transform: scale(1.05);
 }
-
 .tv-show-image {
   width: 100%;
   height: 100%;
   object-fit: cover;
   border-radius: 10px;
 }
-
 .tv-show-info {
   position: absolute;
   bottom: 10px;
@@ -163,7 +145,6 @@ const getGenreName = (id) => {
   display: flex;
   flex-direction: column;
 }
-
 .tv-show-title {
   font-size: 1.2rem;
   font-weight: bold;
@@ -171,42 +152,12 @@ const getGenreName = (id) => {
   text-transform: uppercase;
   letter-spacing: 1px;
 }
-
 .tv-show-release-date {
   font-size: 0.9rem;
   margin-top: 5px;
 }
-
 .loading-overlay {
   z-index: 9999;
   background-color: rgba(0, 0, 0, 0.8);
-}
-header {
-  height: 3rem;
-  display: flex;
-  background-color: #333;
-  color: #ffffff;
-  font-size: 1.2rem;
-  padding-left: 2rem;
-  align-items: center;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
- 
-}
-
-nav {
-  column-gap: 2rem;
-  margin-bottom: 0;
-  display: flex;
-  align-items: center;
-}
-
-nav a {
-  text-decoration: none;
-  color: #ffffff;
-  transition: color 0.3s ease;
-}
-
-nav a:hover {
-  color: #ff6347;
 }
 </style>
