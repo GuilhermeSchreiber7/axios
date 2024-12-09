@@ -9,31 +9,45 @@ const genres = ref([]);
 const tvShows = ref([]);
 
 onMounted(async () => {
-  const response = await api.get("genre/tv/list?language=pt-BR");
-  genres.value = response.data.genres;
+  const cachedGenres = localStorage.getItem("genres");
+  if (cachedGenres) {
+    genres.value = JSON.parse(cachedGenres);
+  } else {
+    try {
+      const response = await api.get("genre/tv/list?language=pt-BR");
+      genres.value = response.data.genres;
+      localStorage.setItem("genres", JSON.stringify(response.data.genres));
+    } catch (error) {
+      console.error("Erro ao buscar gêneros:", error);
+    }
+  }
 });
 
 const listTvShows = async (genreId) => {
   isLoading.value = true;
   try {
-    const response = await api.get('search/tv', {
+    const response = await api.get("search/tv", {
       params: {
-        query: 'Batman',
-        language: 'pt-BR',
-        with_genres: genreId
+        language: "pt-BR",    // Idioma
+        query: "Batman" // Filtro pelo nome do programa
       }
     });
-    tvShows.value = response.data.results;
+    tvShows.value = response.data.results.filter(show =>
+     show.genre_ids.includes(genreId)
+    );
   } catch (error) {
-    console.error('Erro ao buscar programas de TV:', error);
+    console.error("Erro ao buscar programas de TV:", error);
+    tvShows.value = [];
+    alert("Não foi possível carregar os programas de TV. Tente novamente.");
+  } finally {
+    isLoading.value = false;
   }
-  isLoading.value = false;
 };
 
 const getGenreName = (id) => {
   const genre = genres.value.find((genre) => genre.id === id);
-  return genre ? genre.name : 'Desconhecido';
-}
+  return genre ? genre.name : "";
+};
 </script>
 
 <template>
@@ -55,13 +69,16 @@ const getGenreName = (id) => {
     <div class="tv-show-list">
       <div v-for="show in tvShows" :key="show.id" class="tv-show-card">
         <img
-          :src="`https://image.tmdb.org/t/p/w500${show.poster_path}`"
+          :src="show.poster_path
+            ? `https://image.tmdb.org/t/p/w500${show.poster_path}`
+            : '/path/to/placeholder.jpg'"
           :alt="show.name"
           class="tv-show-image"
         />
         <div class="tv-show-info">
           <p class="tv-show-title">{{ show.name }}</p>
           <p class="tv-show-release-date">{{ show.first_air_date }}</p>
+          <p class="tv-genres">{{ getGenreName(show.genre_ids[0]) }}</p>
         </div>
       </div>
     </div>
@@ -101,15 +118,12 @@ const getGenreName = (id) => {
   text-transform: uppercase;
   font-size: 1rem;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-  text-align:  center;
+  text-align: center;
   width: 10rem;
 }
 .genre-item:hover {
   background-color: rgba(255, 255, 255, 0.6);
   transform: translateY(-5px);
-}
-.genre-item:hover {
-  background-color: rgba(255, 255, 255, 0.6);
 }
 .tv-show-list {
   display: grid;
@@ -156,8 +170,15 @@ const getGenreName = (id) => {
   font-size: 0.9rem;
   margin-top: 5px;
 }
+.no-results {
+  text-align: center;
+  color: #f5f5f5;
+  font-size: 1.2rem;
+  margin-top: 2rem;
+}
 .loading-overlay {
   z-index: 9999;
   background-color: rgba(0, 0, 0, 0.8);
 }
+
 </style>

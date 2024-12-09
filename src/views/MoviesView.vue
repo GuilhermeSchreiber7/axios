@@ -17,14 +17,14 @@ const movies = ref([]);
 const listBatmanMoviesByGenre = async (genreId) => {
   isLoading.value = true;
 
-  const response = await api.get("discover/movie", {
+  const response = await api.get("search/movie", {
     params: {
-      with_genres: genreId,
+      query: 'Batman',
       language: "pt-BR",
     },
   });
   movies.value = response.data.results.filter((movie) =>
-    movie.title.toLowerCase().includes("batman")
+    movie.genre_ids.includes(genreId)
   );
   isLoading.value = false;
 };
@@ -60,7 +60,7 @@ function getGenreName(id) {
           <p class="movie-title">{{ movie.title }}</p>
           
           <p class="movie-release-date">{{ movie.release_date }}</p>
-          <p class="movie-genres">{{ movie.genre_ids }}</p>
+          <p class="movie-genres">{{ getGenreName(movie.genre_ids[0]) }}</p>
         </div>
       </div>
     </div>
