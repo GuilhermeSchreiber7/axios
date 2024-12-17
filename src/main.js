@@ -1,5 +1,6 @@
 import './assets/main.css'
-import 'vue-loading-overlay/dist/css/index.css';
+import './assets/tailwind.css';
+
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
 

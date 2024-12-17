@@ -3,6 +3,7 @@ import { ref, onMounted } from "vue";
 import api from "@/plugins/axios";
 import Loading from "vue-loading-overlay";
 import NavBar from "@/components/NavBar.vue";
+import GenreList from "@/components/genreList.vue";
 
 const isLoading = ref(false);
 const genres = ref([]);
@@ -18,7 +19,7 @@ onMounted(async () => {
       genres.value = response.data.genres;
       localStorage.setItem("genres", JSON.stringify(response.data.genres));
     } catch (error) {
-      console.error("Erro ao buscar gêneros:", error);
+      console.error("Error fetching genres:", error);
     }
   }
 });
@@ -26,59 +27,43 @@ onMounted(async () => {
 const listTvShows = async (genreId) => {
   isLoading.value = true;
   try {
-    const response = await api.get("search/tv", {
+    const response = await api.get("discover/tv", {
       params: {
-        language: "pt-BR",    // Idioma
-        query: "Batman" // Filtro pelo nome do programa
-      }
+        language: "pt-BR",
+        with_genres: genreId
+      },
     });
-    tvShows.value = response.data.results.filter(show =>
-     show.genre_ids.includes(genreId)
-    );
+    tvShows.value = response.data.results;
   } catch (error) {
-    console.error("Erro ao buscar programas de TV:", error);
+    console.error("Error fetching TV shows:", error);
     tvShows.value = [];
     alert("Não foi possível carregar os programas de TV. Tente novamente.");
   } finally {
     isLoading.value = false;
   }
 };
-
-const getGenreName = (id) => {
-  const genre = genres.value.find((genre) => genre.id === id);
-  return genre ? genre.name : "";
-};
 </script>
 
 <template>
   <nav-bar />
   <div class="main-container">
-    <h1 class="page-title">Programas de TV relacionados ao Batman</h1>
-    <ul class="genre-list">
-      <li
-        v-for="genre in genres"
-        :key="genre.id"
-        @click="listTvShows(genre.id)"
-        class="genre-item"
-      >
-        {{ genre.name }}
-      </li>
-    </ul>
+    <h1 class="page-title">Programas de TV</h1>
+    <GenreList :genres="genres" @genre-selected="listTvShows" />
     <loading v-model:active="isLoading" is-full-page />
 
     <div class="tv-show-list">
       <div v-for="show in tvShows" :key="show.id" class="tv-show-card">
-        <img
-          :src="show.poster_path
-            ? `https://image.tmdb.org/t/p/w500${show.poster_path}`
-            : '/path/to/placeholder.jpg'"
-          :alt="show.name"
-          class="tv-show-image"
-        />
-        <div class="tv-show-info">
-          <p class="tv-show-title">{{ show.name }}</p>
-          <p class="tv-show-release-date">{{ show.first_air_date }}</p>
-          <p class="tv-genres">{{ getGenreName(show.genre_ids[0]) }}</p>
+        <div class="image-container">
+          <img
+            :src="show.poster_path
+              ? `https://image.tmdb.org/t/p/w500${show.poster_path}`
+              : 'https://via.placeholder.com/300x450?text=Sem+Imagem'"
+            :alt="show.name"
+            class="tv-show-image"
+          />
+          <div class="tv-show-title-overlay">
+            <p class="tv-show-title">{{ show.name }}</p>
+          </div>
         </div>
       </div>
     </div>
@@ -90,95 +75,76 @@ const getGenreName = (id) => {
   background-color: #141414;
   padding: 20px;
   color: white;
-  font-family: 'Arial', sans-serif;
 }
 .page-title {
-  font-size: 2.5rem;
-  font-weight: bold;
+  font-size: 2rem;
   margin-bottom: 1rem;
-  text-align: center;
-  letter-spacing: -1px;
 }
 .genre-list {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
   gap: 1rem;
-  margin-bottom: 2rem;
   list-style: none;
   padding: 0;
+  margin: 0;
 }
 .genre-item {
-  background-color: rgba(255, 255, 255, 0.3);
-  padding: 10px 25px;
-  border-radius: 25px;
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 1rem;
   cursor: pointer;
-  transition: background-color 0.3s ease, transform 0.3s ease;
-  font-weight: bold;
-  text-transform: uppercase;
-  font-size: 1rem;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-  text-align: center;
-  width: 10rem;
-}
-.genre-item:hover {
-  background-color: rgba(255, 255, 255, 0.6);
-  transform: translateY(-5px);
+  transition: background-color 0.3s ease;
+  &:hover {
+    background-color: #367dff;
+    transform: scale(1.05);
+    transition: ease all 0.4s; 
+  } 
 }
 .tv-show-list {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 20px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2rem;
   margin-top: 2rem;
 }
 .tv-show-card {
   position: relative;
+  background-color: #333;
+  border-radius: 0.5rem;
+  width: 18vw;
+  height: 53vh;
   overflow: hidden;
-  border-radius: 10px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-  transition: transform 0.3s ease-in-out;
-  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  &:hover {
+    transform: scale(1.05);
+    transition: transform 0.3s ease;
+  }
 }
-.tv-show-card:hover {
-  transform: scale(1.05);
+.image-container {
+  position: relative;
 }
 .tv-show-image {
   width: 100%;
   height: 100%;
-  object-fit: cover;
-  border-radius: 10px;
+  object-fit: fill; 
 }
-.tv-show-info {
+.tv-show-title-overlay {
   position: absolute;
-  bottom: 10px;
-  left: 10px;
-  right: 10px;
-  padding: 10px;
+  bottom: 0;
+  left: 0;
+  width: 100%;
   background: rgba(0, 0, 0, 0.7);
-  border-radius: 5px;
-  display: flex;
-  flex-direction: column;
+  color: #fff;
+  text-align: center;
+  padding: 0.5rem;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+.image-container:hover .tv-show-title-overlay {
+  opacity: 1;
 }
 .tv-show-title {
   font-size: 1.2rem;
-  font-weight: bold;
   margin: 0;
-  text-transform: uppercase;
-  letter-spacing: 1px;
 }
-.tv-show-release-date {
-  font-size: 0.9rem;
-  margin-top: 5px;
-}
-.no-results {
-  text-align: center;
-  color: #f5f5f5;
-  font-size: 1.2rem;
-  margin-top: 2rem;
-}
-.loading-overlay {
-  z-index: 9999;
-  background-color: rgba(0, 0, 0, 0.8);
-}
-
 </style>
