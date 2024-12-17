@@ -3,25 +3,25 @@ import NavBar from '@/components/NavBar.vue';
 </script>
 
 <template>
+  <div>
+      <NavBar/>
+    </div> 
   <main>  
-    <div>
-   <NavBar/>
-  </div>
-    <div>
-    </div>    
-    <div class="container">
+    
     <h1>Home</h1>
-  </div>
   </main>
 </template>
 
 <style scoped lang="scss">
-
-.container{
- display: flex;
-  justify-content: center;
+main {
+  display: flex;
+  flex-direction: column;
   align-items: center;
-  height: 100vh; 
+  justify-content: center;
+  height: 68vh;
+  text-align: center; 
+
+
 h1 {
   color: #333;
   font-size: 3.5rem;
