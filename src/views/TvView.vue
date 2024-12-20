@@ -104,6 +104,7 @@ const listTvShows = async (genreId) => {
 .tv-show-list {
   display: flex;
   flex-wrap: wrap;
+  justify-content: center;
   gap: 2rem;
   margin-top: 2rem;
 }
@@ -111,7 +112,7 @@ const listTvShows = async (genreId) => {
   position: relative;
   background-color: #333;
   border-radius: 0.5rem;
-  width: 18vw;
+  width: 17vw;
   height: 53vh;
   overflow: hidden;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
@@ -125,7 +126,7 @@ const listTvShows = async (genreId) => {
 }
 .tv-show-image {
   width: 100%;
-  height: 100%;
+  height: 53vh;
   object-fit: fill; 
 }
 .tv-show-title-overlay {
