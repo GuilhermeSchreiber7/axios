@@ -5,6 +5,7 @@ import Loading from "vue-loading-overlay";
 import NavBar from "@/components/NavBar.vue";
 import GenreList from "@/components/genreList.vue";
 
+
 const isLoading = ref(false);
 
 const genres = ref([]);
@@ -50,10 +51,10 @@ const ListMovies = async (genreId) => {
     <GenreList :genres="genres" @genre-selected="ListMovies" />
     <loading :active="isLoading" is-full-page />
     <p v-if="!movies.length && !isLoading" class="no-movies">
-      Nenhum filme encontrado ou erro na busca.
+      Selecione um gênero para ver os filmes.
     </p>
     <div v-if="movies.length" class="movie-list">
-      <div v-for="movie in movies" :key="movie.id" class="movie-card">
+      <div v-for="movie in movies" :key="movie.id" class="movie-card" @click="$router.push({ name: 'MovieDetails', params: { id: movie.id } })">
         <div class="image-container">
           <img
             :src="movie.poster_path 
@@ -90,6 +91,7 @@ const ListMovies = async (genreId) => {
 .movie-list {
   display: flex;
   flex-wrap: wrap;
+  justify-content: center;
   gap: 2rem;
   margin-top: 2rem;
 }
@@ -97,10 +99,11 @@ const ListMovies = async (genreId) => {
   position: relative;
   background-color: #333;
   border-radius: 0.5rem;
-  width: 18vw;
+  width: 17vw;
   height: 53vh;
   overflow: hidden;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
   &:hover {
     transform: scale(1.05);
     transition: transform 0.5s ease;
@@ -111,7 +114,7 @@ const ListMovies = async (genreId) => {
 }
 .movie-image {
   width: 100%;
-  height: 100%;
+  height: 53vh;
   object-fit: fill;
   transition: transform 0.3s ease;
 }
